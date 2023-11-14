@@ -15,22 +15,17 @@ export interface User extends RowDataPacket {
   password: string;
 }
 
-function createToken(user: User) {
+export function createToken(user: User) {
   return jwt.sign({ id: user.id, email: user.email }, config.jwtSecret);
 }
 
-async function encryptPassword(
-  _req: Request,
-  _res: Response,
-  next: NextFunction
-) {
-  const password = "";
+export async function encryptPassword(password: string) {
   const salt = await bcrypt.genSalt(10);
   const hash = await bcrypt.hash(password, salt);
 
-  next();
+  return hash;
 }
 
-async function comparePasswords(password: string) {
-  return await bcrypt.compare(password, "asas");
+export async function comparePasswords(password: string, hash: string) {
+  return await bcrypt.compare(password, hash);
 }

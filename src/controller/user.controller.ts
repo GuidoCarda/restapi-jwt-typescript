@@ -1,6 +1,11 @@
 import { Request, Response } from "express";
 import pool from "../db";
-import { User } from "../models/user.model";
+import {
+  User,
+  comparePasswords,
+  createToken,
+  encryptPassword,
+} from "../models/user.model";
 import {
   FieldPacket,
   ProcedureCallPacket,
@@ -48,9 +53,11 @@ export async function signUp(
     return res.status(400).json({ message: "The user already exists" });
   }
 
-  const result = await pool.execute<ResultSetHeader>(
-    "INSERT INTO `user` (email,password) VALUES (?, ?)",
-    [req.body.email, req.body.password]
+  const hashedPassword = await encryptPassword(req.body.password);
+
+  const result = await pool.execute(
+    "INSERT INTO `user` (email, password) VALUES (?,?)",
+    [req.body.email, hashedPassword]
   );
 
   return res.status(200).json(result);
@@ -72,11 +79,26 @@ export async function signIn(
   );
 
   if (users.length === 0) {
-    return res.status(400).json({ message: "User does not exist" });
+    return res.status(400).json({
+      message: "User does not exists",
+    });
   }
 
   const user = users[0];
-  return res.send(user);
+
+  const passwordMatches = await comparePasswords(
+    req.body.password,
+    user.password
+  );
+
+  if (!passwordMatches) {
+    return res
+      .status(400)
+      .json({ message: "The email or password are incorrect" });
+  }
+
+  const token = createToken(user);
+  return res.status(200).json({ token });
 }
 
 export async function restartDB(_req: Request, res: Response) {
