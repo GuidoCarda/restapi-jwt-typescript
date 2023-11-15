@@ -6,8 +6,21 @@ CREATE TABLE `user`(
   password VARCHAR(255)
 );
 
+CREATE TABLE `order`(
+  id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  description VARCHAR(255),
+  user_id INT UNSIGNED,
+  FOREIGN KEY (user_id) REFERENCES user(id)
+);
+
+INSERT INTO `order` (description, user_id) 
+VALUES ('Order 1', 1), ('Order 2', 2), ('Order 3', 1), ('Order 4', 2), ('Order 5', 3);
+
+
 INSERT INTO `user` (email, password)
 VALUES ('test@test.com', '123');
+
+
 
 
 DELIMITER //
