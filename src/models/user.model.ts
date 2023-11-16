@@ -13,6 +13,7 @@ export interface User extends RowDataPacket {
   id: number;
   email: string;
   password: string;
+  role: "client" | "staff";
 }
 
 export function createToken(user: User) {

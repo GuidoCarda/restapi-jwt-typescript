@@ -1,4 +1,4 @@
-import { RowDataPacket } from "mysql2";
+import { ResultSetHeader, RowDataPacket } from "mysql2";
 import pool from "../db";
 import { NextFunction, Request, Response } from "express";
 import { User } from "../models/user.model";
@@ -42,17 +42,20 @@ export async function getOne(req: Request, res: Response) {
 }
 
 export async function create(req: Request, res: Response) {
-  const { id } = req.user as User;
+  console.log(req.user);
+  const { id: userId } = req.user as User;
   const { description } = req.body;
 
-  const result = await pool.query<RowDataPacket[]>(
+  const result = await pool.query<ResultSetHeader>(
     "INSERT INTO `order` (description, user_id) VALUES (?,?)",
-    [description, id]
+    [description, userId]
   );
+
+  console.log(result);
 
   return res.json({
     message: "Order created",
-    id: (result[0] as any).insertId,
+    id: result[0].insertId,
   });
 }
 
