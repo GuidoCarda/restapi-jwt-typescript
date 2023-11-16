@@ -19,4 +19,28 @@ router.get(
   orderController.getAll
 );
 
+router.get(
+  "/orders/:orderId",
+  passport.authenticate("jwt", { session: false }),
+  orderController.getOne
+);
+
+router.post(
+  "/orders",
+  passport.authenticate("jwt", { session: false }),
+  orderController.create
+);
+
+router.put(
+  "/orders/:orderId",
+  passport.authenticate("jwt", { session: false }),
+  orderController.update
+);
+
+router.get(
+  "/user/:userId/orders",
+  passport.authenticate("jwt", { session: false }),
+  orderController.getAllFromUser
+);
+
 export default router;
